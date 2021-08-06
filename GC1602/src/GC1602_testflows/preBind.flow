@@ -1,0 +1,22 @@
+flow preBind {
+    setup {
+        suite import_limit_table calls
+        com.advantest.itee.testtable.testmethod.TestTableReader {
+            testTablePath = "GC1602_testtable/GC1602_testtable_Master.ods";
+            limitCategory = "FT";
+            logLevelCategory = "FT";
+            errorLogPath = "/tmp";
+            forceImport = true;
+            createParameterGroups = true;
+            printToConsole = false;
+        }
+        suite init calls tmlCommon.GVarInit {
+        }
+
+    }
+
+    execute {
+        import_limit_table.execute();
+        init.execute();
+    }
+}

@@ -1,0 +1,53 @@
+flow OS {
+    setup {
+        suite Relay_Switch_Restore calls miscellaneous_tml.SetUtilityLines {
+            relayList_On = "";
+            relayList_Off =
+            "K_36K_IP+K00+K01+K02+K03+K04+K05+K07+K08+K09+K10+K11+K12+K13+K14+K15+K16+K17+K18+K19+KK1+KK5+KK7+KK9+KK11+KK13+KK15+KK21+KK23";
+            // "K00,K01,K02,K03,K04,K05,KK1,K09,K10,K11,K12,K15,K16,K13,K14"
+
+        }
+
+        suite Continuity_PPMU calls GC1602_tml.DC_TML.Continuity_dcVI {
+            importSpec =
+            setupRef(GC1602_mainSpecification.Spc_Lev_eqn1_spec1_set1_Tim_eqn66_spec1_set1);
+        }
+
+        suite Bridge_Test calls com.advantest.itee.tml.actml.FunctionalTest {
+            measurement.pattern = setupRef(GC1602_vectors.Bridge_all);
+            measurement.specification =
+            setupRef(GC1602_mainSpecification.Spc_Lev_eqn1_spec2_set1_Tim_eqn66_spec1_set1);
+        }
+        suite Power_Short calls GC1602_tml.DC_TML.Power_Short {
+            importSpec =
+            setupRef(GC1602_mainSpecification.Spc_Lev_eqn1_spec2_set1_Tim_eqn66_spec1_set1);
+        }
+    }
+    execute {
+        Relay_Switch_Restore.execute();
+
+        Continuity_PPMU.execute();
+        if (! Continuity_PPMU.pass) {
+           if (testProgramVariables.getString("stop_flag") == "true") {
+                stop();
+            }
+        }
+
+
+        Bridge_Test.execute();
+        if (! Bridge_Test.pass) {
+            if (testProgramVariables.getString("stop_flag") == "true") {
+                stop();
+            }
+        }
+
+
+        Power_Short.execute();
+        if (! Power_Short.pass) {
+           if (testProgramVariables.getString("stop_flag") == "true") {
+                stop();
+            }
+        }
+
+    }
+}

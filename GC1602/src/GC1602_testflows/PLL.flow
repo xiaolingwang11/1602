@@ -1,0 +1,90 @@
+flow PLL {
+    setup {
+    //        suite PLL_ATE_FREQ calls GC1602_tml.AC_TML.PLL_1Pin_Serial_DigCap {
+    //        // The following pattern cannot be resolved;
+    //        // pattern_name = setupRef(vectors.47_NemoL_AnalogIP_PLL_ATE_FREQ_CNT_AA_20191025);
+    //            importSpec =
+    //            setupRef(mainSpecs.Nemol_B201.Spc_Lev_eqn2_spec1_set1_Tim_eqn96_spec1_set1);
+    //        }
+        suite PLL_BIST_CNT_AUX_26M calls GC1602_tml.AC_TML.PLL_BIST_CNT {
+            pattern_name =
+            setupRef(GC1602_vectors.NemoL_AnalogIP_PLL_BIST_CNT_AUX_TEST_26M_AA_20191125);
+            importSpec =
+            setupRef(GC1602_mainSpecification.Spc_Lev_eqn2_spec1_set1_Tim_eqn96_spec3_set1);
+            capSignals =  "U0RTS+U0CTS+U0RXD+U0TXD+NF_DQS+NF_DATA_1+U1RXD+U1TXD";
+            // NemoL_AnalogIP_PLL_BIST_CNT_AUX_TEST_26M_AA_20191125
+            // Vector Variable Pins U0RTS,U0CTS,U0RXD,U0TXD,NF_DQS,NF_DATA_1,U1RXD,U1TXD
+            // Transfer Mode Parallel
+            // Frame Length in Samples 24
+            // Frame Count 1
+            // Samples per Word 1
+            // Defined Capture Pins    U0RTS,U0CTS,U0RXD,U0TXD,NF_DQS,NF_DATA_1,U1RXD,U1TXD
+
+        }
+        suite PLL_BIST_CNT_AUX_ATE calls GC1602_tml.AC_TML.PLL_BIST_CNT {
+            pattern_name =
+            setupRef(GC1602_vectors.NemoL_AnalogIP_PLL_BIST_CNT_AUX_TEST_ATE_AA_20191125);
+            importSpec =
+            setupRef(GC1602_mainSpecification.Spc_Lev_eqn2_spec1_set1_Tim_eqn96_spec1_set1_FDMACapEnabled);
+            capSignals =  "U0RTS+U0CTS+U0RXD+U0TXD+NF_DQS+NF_DATA_1+U1RXD+U1TXD";
+            //NemoL_AnalogIP_PLL_BIST_CNT_AUX_TEST_ATE_AA_20191125
+            //Vector Variable Pins    U0RTS,U0CTS,U0RXD,U0TXD,NF_DQS,NF_DATA_1,U1RXD,U1TXD
+            //Transfer Mode   Parallel
+            //Frame Length in Samples 24
+            //Frame Count 1
+            //Samples per Word    1
+            //Defined Capture Pins    U1TXD,U1RXD,NF_DQS,NF_DATA_1,U0TXD,U0RXD,U0CTS,U0RTS
+
+        }
+        //        suite PLL_FREQ_BIST calls GC1602_tml.AC_TML.PLL_1Pin_Serial_DigCap {
+        //        // The following pattern cannot be resolved;
+        //        // pattern_name = setupRef(vectors.47_NemoL_AnalogIP_PLL_FREQ_BIST_CNT_AA_20191024);
+        //            importSpec =
+        //            setupRef(mainSpecs.Nemol_B201.Spc_Lev_eqn2_spec1_set1_Tim_eqn95_spec1_set1);
+        //        }
+        suite PLL_SINE_DRV calls GC1602_tml.AC_TML.PLL_1Pin_Serial_DigCap {
+            pattern_name = setupRef(GC1602_vectors.NemoL_AnalogIP_PLL_SINE_DRV_AA_20191025);
+            importSpec =
+            setupRef(GC1602_mainSpecification.Spc_Lev_eqn2_spec1_set1_Tim_eqn95_spec1_set1);
+            capSignal = "CLK26M_SINEOUT";
+            sample_period_ns = 4.80769230775;
+            //NemoL_AnalogIP_PLL_SINE_DRV_AA_20191025
+            //Vector Variable Pins    CLK26M_SINEOUT
+            //Transfer Mode   Parallel
+            //Frame Length in Samples 4096
+            //Frame Count 1
+            //Samples per Word    1
+            //Defined Capture Pins    CLK26M_SINEOUT
+            // RP0TV Cx8 4096
+
+        }
+        suite PLL_REC_BUF calls GC1602_tml.AC_TML.PLL_1Pin_Serial_DigCap {
+            pattern_name = setupRef(GC1602_vectors.NemoL_AnologIP_PLL_REC_BUF_AA_20191219);
+            importSpec =
+            setupRef(GC1602_mainSpecification.Spc_Lev_eqn2_spec1_set1_Tim_eqn95_spec1_set1);
+            capSignal = "CLK_AUX0";
+            sample_period_ns = 4.80769230775;
+            //NemoL_AnologIP_PLL_REC_BUF_AA_20191219
+            //Vector Variable Pins    CLK_AUX0
+            //Transfer Mode   Parallel
+            //Frame Length in Samples 4096
+            //Frame Count 1
+            //Samples per Word    1
+            //Defined Capture Pins    CLK_AUX0
+            // RP0TV Cx8 4096
+
+        }
+    }
+
+    execute {
+    //        PLL_ATE_FREQ.bypass = true;
+    //        PLL_ATE_FREQ.execute();
+        PLL_BIST_CNT_AUX_26M.execute();
+        PLL_BIST_CNT_AUX_ATE.execute();
+
+        //        PLL_FREQ_BIST.bypass = true;
+        //        PLL_FREQ_BIST.execute();
+        PLL_SINE_DRV.execute();
+        PLL_REC_BUF.execute();
+    }
+}

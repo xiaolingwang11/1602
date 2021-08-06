@@ -1,0 +1,973 @@
+protocol FDMA_bak {
+// Read  Template : FDMA_READ
+// Write Template : FDMA_WRITE1
+//----------------------------------------
+
+//rAddrIdx : 5627,+1,+2,+3 -> LL8,LM8,HM8,HH8
+    val UnsignedLong rAddrIdx = 5627;
+    //rDataIdx : 5787,+1,+2,+3 -> LL8,LM8,HM8,HH8
+    val UnsignedLong rDataIdx = 5787;
+    //wAddrIdx : 5627,+1,+2,+3 -> LL8,LM8,HM8,HH8
+    val UnsignedLong wAddrIdx = 5627;
+    //wDataIdx : 5631,+1,+2,+3 -> LL8,LM8,HM8,HH8
+    val UnsignedLong wDataIdx = 5631;
+    mapping = drv[state0 = "0", state1 = "1"], rcv[state0 = "L", state1 = "H", capture =
+        "C", ignore = "X"];
+        // -----------------------
+    signalRole sig_U1TXD {
+        idleSequence = "0";
+    }
+    signalRole sig_U1RXD {
+        idleSequence = "0";
+    }
+    signalRole sig_NF_DATA_1 {
+        idleSequence = "0";
+    }
+    signalRole sig_NF_DQS {
+        idleSequence = "0";
+    }
+    signalRole sig_U0TXD {
+        idleSequence = "0";
+    }
+    signalRole sig_U0RXD {
+        idleSequence = "0";
+    }
+    signalRole sig_U0CTS {
+        idleSequence = "0";
+    }
+    signalRole sig_U0RTS {
+        idleSequence = "0";
+    }
+    signalRole sig_SDI1 {
+        idleSequence = "0";
+    }
+    // -----------------------
+
+    //wAddrIdx : 5627,+1,+2,+3 -> LL8,LM8,HM8,HH8
+    //wDataIdx : 5631,+1,+2,+3 -> LL8,LM8,HM8,HH8
+    // LSB -> MSB : U1TXD, U1RXD, NF_DATA_1, NF_DQA, U0TXD, U0RXD, U0CTS, U0RTS
+    transaction write ( UnsignedLong IN Address, UnsignedLong IN Data ) {
+
+        define sig_U1TXD {
+            field drive _0to5198;
+            _0to5198 = repeat ( "0", 5199 );
+
+            field drive _5199to5262;
+            _5199to5262 = repeat ( "X", 5262 - 5199 + 1 );
+            //            field drive _5263to5294;
+            //            _5263to5294 = repeat ( "0", 5294 - 5263 + 1 );
+            field drive _5263to5266;
+            _5263to5266 = "0001";
+
+            field drive _5267to5292;
+            _5267to5292 = repeat ( "0", 5292 - 5267 + 1 );
+
+            field drive _5293to5294;
+            _5293to5294 = "10";
+
+            field drive _5295to5622;
+            _5295to5622 = repeat ( "X", 5622 - 5295 + 1 );
+
+            field drive preAddr;
+            preAddr = "0001";
+            // ----- addr -----> U1TXD
+            field drive addrLL;
+            addrLL = Address[0];
+
+            field drive addrLM;
+            addrLM = Address[8];
+
+            field drive addrHM;
+            addrHM = Address[16];
+
+            field drive addrHH;
+            addrHH = Address[24];
+            // ----- addr -----> U1TXD
+
+            // ----- data -----> U1TXD
+            field drive dataLL;
+            dataLL = Data[0];
+
+            field drive dataLM;
+            dataLM = Data[8];
+
+            field drive dataHM;
+            dataHM = Data[16];
+
+            field drive dataHH;
+            dataHH = Data[24];
+            // ----- data -----> U1TXD
+            field drive tail;
+            tail = repeat ( "X", 50000 );
+        }
+
+        define sig_U1RXD {
+            field drive _0to5198;
+            _0to5198 = repeat ( "H", 5199 );
+
+            field drive _5199to5262;
+            _5199to5262 = repeat ( "X", 5262 - 5199 + 1 );
+
+            field drive _5263to5294;
+            _5263to5294 = repeat ( "H", 5294 - 5263 + 1 );
+
+            field drive _5295to5622;
+            _5295to5622 = repeat ( "X", 5622 - 5295 + 1 );
+
+            field drive preAddr;
+            preAddr = "0000";
+            // ----- addr ----->  U1RXD
+            field drive addrLL;
+            addrLL = Address[1];
+
+            field drive addrLM;
+            addrLM = Address[9];
+
+            field drive addrHM;
+            addrHM = Address[17];
+
+            field drive addrHH;
+            addrHH = Address[25];
+            // ----- addr ----->  U1RXD
+
+            // ----- data ----->  U1RXD
+            field drive dataLL;
+            dataLL = Data[1];
+
+            field drive dataLM;
+            dataLM = Data[9];
+
+            field drive dataHM;
+            dataHM = Data[17];
+
+            field drive dataHH;
+            dataHH = Data[25];
+            // ----- data ----->  U1RXD
+            field drive tail;
+            tail = repeat ( "X", 50000 );
+        }
+
+        define sig_NF_DATA_1 {
+            field drive _0to5198;
+            _0to5198 = repeat ( "0", 5199 );
+
+            field drive _5199to5262;
+            _5199to5262 = repeat ( "X", 5262 - 5199 + 1 );
+
+            field drive _5263to5294;
+            _5263to5294 = repeat ( "1", 5294 - 5263 + 1 );
+
+            field drive _5295to5622;
+            _5295to5622 = repeat ( "X", 5622 - 5295 + 1 );
+
+            field drive preAddr;
+            preAddr = "0000";
+            // ----- addr ----->  NF_DATA_1
+            field drive addrLL;
+            addrLL = Address[2];
+
+            field drive addrLM;
+            addrLM = Address[10];
+
+            field drive addrHM;
+            addrHM = Address[18];
+
+            field drive addrHH;
+            addrHH = Address[26];
+            // ----- addr ----->  NF_DATA_1
+
+            // ----- data ----->  NF_DATA_1
+            field drive dataLL;
+            dataLL = Data[2];
+
+            field drive dataLM;
+            dataLM = Data[10];
+
+            field drive dataHM;
+            dataHM = Data[18];
+
+            field drive dataHH;
+            dataHH = Data[26];
+            // ----- data ----->  NF_DATA_1
+            field drive tail;
+            tail = repeat ( "X", 50000 );
+        }
+
+        define sig_NF_DQS {
+            field drive _0to5198;
+            _0to5198 = repeat ( "0", 5199 );
+
+            field drive _5199to5262;
+            _5199to5262 = repeat ( "X", 5262 - 5199 + 1 );
+
+            field drive _5263to5294;
+            _5263to5294 = repeat ( "1", 5294 - 5263 + 1 );
+
+            field drive _5295to5622;
+            _5295to5622 = repeat ( "X", 5622 - 5295 + 1 );
+
+            field drive preAddr;
+            preAddr = "0000";
+            // ----- addr ----->  NF_DQS
+            field drive addrLL;
+            addrLL = Address[3];
+
+            field drive addrLM;
+            addrLM = Address[11];
+
+            field drive addrHM;
+            addrHM = Address[19];
+
+            field drive addrHH;
+            addrHH = Address[27];
+            // ----- addr ----->  NF_DQS
+
+            // ----- data ----->  NF_DQS
+            field drive dataLL;
+            dataLL = Data[3];
+
+            field drive dataLM;
+            dataLM = Data[11];
+
+            field drive dataHM;
+            dataHM = Data[19];
+
+            field drive dataHH;
+            dataHH = Data[27];
+            // ----- data ----->  NF_DQS
+            field drive tail;
+            tail = repeat ( "X", 50000 );
+        }
+
+        define sig_U0TXD {
+            field drive _0to5198;
+            _0to5198 = repeat ( "0", 5199 );
+
+            field drive _5199to5262;
+            _5199to5262 = repeat ( "X", 5262 - 5199 + 1 );
+
+            field drive _5263to5294;
+            _5263to5294 = repeat ( "0", 5294 - 5263 + 1 );
+
+            field drive _5295to5622;
+            _5295to5622 = repeat ( "X", 5622 - 5295 + 1 );
+
+            field drive preAddr;
+            preAddr = "1000";
+            // ----- addr ----->  U0TXD
+            field drive addrLL;
+            addrLL = Address[4];
+
+            field drive addrLM;
+            addrLM = Address[12];
+
+            field drive addrHM;
+            addrHM = Address[20];
+
+            field drive addrHH;
+            addrHH = Address[28];
+            // ----- addr ----->  U0TXD
+
+            // ----- data ----->  U0TXD
+            field drive dataLL;
+            dataLL = Data[4];
+
+            field drive dataLM;
+            dataLM = Data[12];
+
+            field drive dataHM;
+            dataHM = Data[20];
+
+            field drive dataHH;
+            dataHH = Data[28];
+            // ----- data ----->  U0TXD
+            field drive tail;
+            tail = repeat ( "X", 50000 );
+        }
+
+        define sig_U0RXD {
+            field drive _0to5198;
+            _0to5198 = repeat ( "0", 5199 );
+
+            field drive _5199to5262;
+            _5199to5262 = repeat ( "X", 5262 - 5199 + 1 );
+
+            field drive _5263to5294;
+            _5263to5294 = repeat ( "1", 5294 - 5263 + 1 );
+
+            field drive _5295to5622;
+            _5295to5622 = repeat ( "X", 5622 - 5295 + 1 );
+
+            field drive preAddr;
+            preAddr = "1000";
+            // ----- addr ----->  U0RXD
+            field drive addrLL;
+            addrLL = Address[5];
+
+            field drive addrLM;
+            addrLM = Address[13];
+
+            field drive addrHM;
+            addrHM = Address[21];
+
+            field drive addrHH;
+            addrHH = Address[29];
+            // ----- addr ----->  U0RXD
+
+            // ----- data ----->  U0RXD
+            field drive dataLL;
+            dataLL = Data[5];
+
+            field drive dataLM;
+            dataLM = Data[13];
+
+            field drive dataHM;
+            dataHM = Data[21];
+
+            field drive dataHH;
+            dataHH = Data[29];
+            // ----- data ----->  U0RXD
+            field drive tail;
+            tail = repeat ( "X", 50000 );
+        }
+
+        define sig_U0CTS {
+            field drive _0to5198;
+            _0to5198 = repeat ( "0", 5199 );
+
+            field drive _5199to5262;
+            _5199to5262 = repeat ( "X", 5262 - 5199 + 1 );
+
+            field drive _5263to5294;
+            _5263to5294 = repeat ( "0", 5294 - 5263 + 1 );
+
+            field drive _5295to5622;
+            _5295to5622 = repeat ( "X", 5622 - 5295 + 1 );
+
+            field drive preAddr;
+            preAddr = "1000";
+            // ----- addr ----->  U0CTS
+            field drive addrLL;
+            addrLL = Address[6];
+
+            field drive addrLM;
+            addrLM = Address[14];
+
+            field drive addrHM;
+            addrHM = Address[22];
+
+            field drive addrHH;
+            addrHH = Address[30];
+            // ----- addr ----->  U0CTS
+
+            // ----- data ----->  U0CTS
+            field drive dataLL;
+            dataLL = Data[6];
+
+            field drive dataLM;
+            dataLM = Data[14];
+
+            field drive dataHM;
+            dataHM = Data[22];
+
+            field drive dataHH;
+            dataHH = Data[30];
+            // ----- data ----->  U0CTS
+            field drive tail;
+            tail = repeat ( "X", 50000 );
+        }
+
+        define sig_U0RTS {
+            field drive _0to5198;
+            _0to5198 = repeat ( "0", 5199 );
+
+            field drive _5199to5262;
+            _5199to5262 = repeat ( "X", 5262 - 5199 + 1 );
+
+            field drive _5263to5294;
+            _5263to5294 = repeat ( "0", 5294 - 5263 + 1 );
+
+            field drive _5295to5622;
+            _5295to5622 = repeat ( "X", 5622 - 5295 + 1 );
+
+            field drive preAddr;
+            preAddr = "0000";
+            // ----- addr ----->  U0RTS
+            field drive addrLL;
+            addrLL = Address[7];
+
+            field drive addrLM;
+            addrLM = Address[15];
+
+            field drive addrHM;
+            addrHM = Address[23];
+
+            field drive addrHH;
+            addrHH = Address[31];
+            // ----- addr ----->  U0RTS
+
+            // ----- data ----->  U0RTS
+            field drive dataLL;
+            dataLL = Data[7];
+
+            field drive dataLM;
+            dataLM = Data[15];
+
+            field drive dataHM;
+            dataHM = Data[23];
+
+            field drive dataHH;
+            dataHH = Data[31];
+            // ----- data ----->  U0RTS
+            field drive tail;
+            tail = repeat ( "X", 50000 );
+        }
+
+        define sig_SDI1 {
+            field drive _0to5198;
+            _0to5198 = repeat ( "0", 5199 );
+
+            field drive _5199to5262;
+            _5199to5262 = repeat ( "1", 5262 - 5199 + 1 );
+
+            field drive _5263to5294;
+            _5263to5294 = repeat ( "0", 5294 - 5263 + 1 );
+
+            field drive _5295to5622;
+            _5295to5622 = repeat ( "1", 5622 - 5295 + 1 );
+
+            field drive preTail;
+            preTail = "000000000000";
+
+            field drive tail;
+            tail = repeat ( "1", 50000 );
+        }
+    }
+    //rAddrIdx : 5627,+1,+2,+3 -> LL8,LM8,HM8,HH8
+    //rDataIdx : 5787,+1,+2,+3 -> LL8,LM8,HM8,HH8
+    // LSB -> MSB : U1TXD, U1RXD, NF_DATA_1, NF_DQA, U0TXD, U0RXD, U0CTS, U0RTS
+    transaction read ( UnsignedLong IN Address, UnsignedLong OUT Data ) {
+
+        define sig_U1TXD {
+            field drive _0to5198;
+            _0to5198 = repeat ( "0", 5199 );
+
+            field drive _5199to5262;
+            _5199to5262 = repeat ( "X", 5262 - 5199 + 1 );
+            //            field drive _5263to5294;
+            //            _5263to5294 = repeat ( "0", 5294 - 5263 + 1 );
+            field drive _5263to5266;
+            _5263to5266 = "0001";
+
+            field drive _5267to5292;
+            _5267to5292 = repeat ( "0", 5292 - 5267 + 1 );
+
+            field drive _5293to5294;
+            _5293to5294 = "10";
+
+            field drive _5295to5622;
+            _5295to5622 = repeat ( "X", 5622 - 5295 + 1 );
+
+            field drive preAddr;
+            preAddr = "0001";
+            // ----- addr -----> U1TXD
+            field drive addrLL;
+            addrLL = Address[0];
+
+            field drive addrLM;
+            addrLM = Address[8];
+
+            field drive addrHM;
+            addrHM = Address[16];
+
+            field drive addrHH;
+            addrHH = Address[24];
+            // ----- addr -----> U1TXD
+            field drive _5631to5781;
+            _5631to5781 = repeat ( "X", 5781 - 5631 + 1 );
+
+            field drive preData;
+            preData = "00000";
+            // ----- data -----> U1TXD
+            field receive dataLL;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataLL = Data[0];
+
+            field receive dataLM;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataLM = Data[8];
+
+            field receive dataHM;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataHM = Data[16];
+
+            field receive dataHH;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataHH = Data[24];
+            // ----- data -----> U1TXD
+            field drive tail;
+            tail = repeat ( "X", 50000 );
+        }
+
+        define sig_U1RXD {
+            field drive _0to5198;
+            _0to5198 = repeat ( "H", 5199 );
+
+            field drive _5199to5262;
+            _5199to5262 = repeat ( "X", 5262 - 5199 + 1 );
+
+            field drive _5263to5294;
+            _5263to5294 = repeat ( "H", 5294 - 5263 + 1 );
+
+            field drive _5295to5622;
+            _5295to5622 = repeat ( "X", 5622 - 5295 + 1 );
+
+            field drive preAddr;
+            preAddr = "0000";
+            // ----- addr ----->  U1RXD
+            field drive addrLL;
+            addrLL = Address[1];
+
+            field drive addrLM;
+            addrLM = Address[9];
+
+            field drive addrHM;
+            addrHM = Address[17];
+
+            field drive addrHH;
+            addrHH = Address[25];
+            // ----- addr ----->  U1RXD
+            field drive _5631to5781;
+            _5631to5781 = repeat ( "X", 5781 - 5631 + 1 );
+
+            field drive preData;
+            preData = "00000";
+            // ----- data ----->  U1RXD
+            field receive dataLL;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataLL = Data[1];
+
+            field receive dataLM;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataLM = Data[9];
+
+            field receive dataHM;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataHM = Data[17];
+
+            field receive dataHH;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataHH = Data[25];
+            // ----- data ----->  U1RXD
+            field drive tail;
+            tail = repeat ( "X", 50000 );
+        }
+
+        define sig_NF_DATA_1 {
+            field drive _0to5198;
+            _0to5198 = repeat ( "0", 5199 );
+
+            field drive _5199to5262;
+            _5199to5262 = repeat ( "X", 5262 - 5199 + 1 );
+
+            field drive _5263to5294;
+            _5263to5294 = repeat ( "1", 5294 - 5263 + 1 );
+
+            field drive _5295to5622;
+            _5295to5622 = repeat ( "X", 5622 - 5295 + 1 );
+
+            field drive preAddr;
+            preAddr = "0000";
+            // ----- addr ----->  NF_DATA_1
+            field drive addrLL;
+            addrLL = Address[2];
+
+            field drive addrLM;
+            addrLM = Address[10];
+
+            field drive addrHM;
+            addrHM = Address[18];
+
+            field drive addrHH;
+            addrHH = Address[26];
+            // ----- addr ----->  NF_DATA_1
+            field drive _5631to5781;
+            _5631to5781 = repeat ( "X", 5781 - 5631 + 1 );
+
+            field drive preData;
+            preData = "00011";
+            // ----- data ----->  NF_DATA_1
+            field receive dataLL;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataLL = Data[2];
+
+            field receive dataLM;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataLM = Data[10];
+
+            field receive dataHM;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataHM = Data[18];
+
+            field receive dataHH;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataHH = Data[26];
+            // ----- data ----->  NF_DATA_1
+            field drive tail;
+            tail = repeat ( "X", 50000 );
+        }
+
+        define sig_NF_DQS {
+            field drive _0to5198;
+            _0to5198 = repeat ( "0", 5199 );
+
+            field drive _5199to5262;
+            _5199to5262 = repeat ( "X", 5262 - 5199 + 1 );
+
+            field drive _5263to5294;
+            _5263to5294 = repeat ( "1", 5294 - 5263 + 1 );
+
+            field drive _5295to5622;
+            _5295to5622 = repeat ( "X", 5622 - 5295 + 1 );
+
+            field drive preAddr;
+            preAddr = "0000";
+            // ----- addr ----->  NF_DQS
+            field drive addrLL;
+            addrLL = Address[3];
+
+            field drive addrLM;
+            addrLM = Address[11];
+
+            field drive addrHM;
+            addrHM = Address[19];
+
+            field drive addrHH;
+            addrHH = Address[27];
+            // ----- addr ----->  NF_DQS
+            field drive _5631to5781;
+            _5631to5781 = repeat ( "X", 5781 - 5631 + 1 );
+
+            field drive preData;
+            preData = "00000";
+            // ----- data ----->  NF_DQS
+            field receive dataLL;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataLL = Data[3];
+
+            field receive dataLM;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataLM = Data[11];
+
+            field receive dataHM;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataHM = Data[19];
+
+            field receive dataHH;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataHH = Data[27];
+            // ----- data ----->  NF_DQS
+            field drive tail;
+            tail = repeat ( "X", 50000 );
+        }
+
+        define sig_U0TXD {
+            field drive _0to5198;
+            _0to5198 = repeat ( "0", 5199 );
+
+            field drive _5199to5262;
+            _5199to5262 = repeat ( "X", 5262 - 5199 + 1 );
+
+            field drive _5263to5294;
+            _5263to5294 = repeat ( "0", 5294 - 5263 + 1 );
+
+            field drive _5295to5622;
+            _5295to5622 = repeat ( "X", 5622 - 5295 + 1 );
+
+            field drive preAddr;
+            preAddr = "0000";
+            // ----- addr ----->  U0TXD
+            field drive addrLL;
+            addrLL = Address[4];
+
+            field drive addrLM;
+            addrLM = Address[12];
+
+            field drive addrHM;
+            addrHM = Address[20];
+
+            field drive addrHH;
+            addrHH = Address[28];
+            // ----- addr ----->  U0TXD
+            field drive _5631to5781;
+            _5631to5781 = repeat ( "X", 5781 - 5631 + 1 );
+
+            field drive preData;
+            preData = "10000";
+            // ----- data ----->  U0TXD
+            field receive dataLL;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataLL = Data[4];
+
+            field receive dataLM;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataLM = Data[12];
+
+            field receive dataHM;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataHM = Data[20];
+
+            field receive dataHH;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataHH = Data[28];
+            // ----- data ----->  U0TXD
+            field drive tail;
+            tail = repeat ( "X", 50000 );
+        }
+
+        define sig_U0RXD {
+            field drive _0to5198;
+            _0to5198 = repeat ( "0", 5199 );
+
+            field drive _5199to5262;
+            _5199to5262 = repeat ( "X", 5262 - 5199 + 1 );
+
+            field drive _5263to5294;
+            _5263to5294 = repeat ( "1", 5294 - 5263 + 1 );
+
+            field drive _5295to5622;
+            _5295to5622 = repeat ( "X", 5622 - 5295 + 1 );
+
+            field drive preAddr;
+            preAddr = "0000";
+            // ----- addr ----->  U0RXD
+            field drive addrLL;
+            addrLL = Address[5];
+
+            field drive addrLM;
+            addrLM = Address[13];
+
+            field drive addrHM;
+            addrHM = Address[21];
+
+            field drive addrHH;
+            addrHH = Address[29];
+            // ----- addr ----->  U0RXD
+            field drive _5631to5781;
+            _5631to5781 = repeat ( "X", 5781 - 5631 + 1 );
+
+            field drive preData;
+            preData = "00000";
+            // ----- data ----->  U0RXD
+            field receive dataLL;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataLL = Data[5];
+
+            field receive dataLM;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataLM = Data[13];
+
+            field receive dataHM;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataHM = Data[21];
+
+            field receive dataHH;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataHH = Data[29];
+            // ----- data ----->  U0RXD
+            field drive tail;
+            tail = repeat ( "X", 50000 );
+        }
+
+        define sig_U0CTS {
+            field drive _0to5198;
+            _0to5198 = repeat ( "0", 5199 );
+
+            field drive _5199to5262;
+            _5199to5262 = repeat ( "X", 5262 - 5199 + 1 );
+
+            field drive _5263to5294;
+            _5263to5294 = repeat ( "0", 5294 - 5263 + 1 );
+
+            field drive _5295to5622;
+            _5295to5622 = repeat ( "X", 5622 - 5295 + 1 );
+
+            field drive preAddr;
+            preAddr = "1000";
+            // ----- addr ----->  U0CTS
+            field drive addrLL;
+            addrLL = Address[6];
+
+            field drive addrLM;
+            addrLM = Address[14];
+
+            field drive addrHM;
+            addrHM = Address[22];
+
+            field drive addrHH;
+            addrHH = Address[30];
+            // ----- addr ----->  U0CTS
+            field drive _5631to5781;
+            _5631to5781 = repeat ( "X", 5781 - 5631 + 1 );
+
+            field drive preData;
+            preData = "10000";
+            // ----- data ----->  U0CTS
+            field receive dataLL;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataLL = Data[6];
+
+            field receive dataLM;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataLM = Data[14];
+
+            field receive dataHM;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataHM = Data[22];
+
+            field receive dataHH;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataHH = Data[30];
+            // ----- data ----->  U0CTS
+            field drive tail;
+            tail = repeat ( "X", 50000 );
+        }
+
+        define sig_U0RTS {
+            field drive _0to5198;
+            _0to5198 = repeat ( "0", 5199 );
+
+            field drive _5199to5262;
+            _5199to5262 = repeat ( "X", 5262 - 5199 + 1 );
+
+            field drive _5263to5294;
+            _5263to5294 = repeat ( "0", 5294 - 5263 + 1 );
+
+            field drive _5295to5622;
+            _5295to5622 = repeat ( "X", 5622 - 5295 + 1 );
+
+            field drive preAddr;
+            preAddr = "0000";
+            // ----- addr ----->  U0RTS
+            field drive addrLL;
+            addrLL = Address[7];
+
+            field drive addrLM;
+            addrLM = Address[15];
+
+            field drive addrHM;
+            addrHM = Address[23];
+
+            field drive addrHH;
+            addrHH = Address[31];
+            // ----- addr ----->  U0RTS
+            field drive _5631to5781;
+            _5631to5781 = repeat ( "X", 5781 - 5631 + 1 );
+
+            field drive preData;
+            preData = "00000";
+            // ----- data ----->  U0RTS
+            field receive dataLL;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataLL = Data[7];
+
+            field receive dataLM;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataLM = Data[15];
+
+            field receive dataHM;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataHM = Data[23];
+
+            field receive dataHH;
+            @Properties ( captureMode = isOut ( Data ) )
+            dataHH = Data[31];
+            // ----- data ----->  U0RTS
+            field drive tail;
+            tail = repeat ( "X", 50000 );
+        }
+
+        define sig_SDI1 { // for read
+            field drive _0to5198;
+            _0to5198 = repeat ( "0", 5199 );
+
+            field drive _5199to5262;
+            _5199to5262 = repeat ( "1", 5262 - 5199 + 1 );
+
+            field drive _5263to5294;
+            _5263to5294 = repeat ( "0", 5294 - 5263 + 1 );
+
+            field drive _5295to5622;
+            _5295to5622 = repeat ( "1", 5622 - 5295 + 1 );
+
+            field drive _5623to5630;
+            _5623to5630 = "00000000";
+
+            field drive _5631to5781;
+            _5631to5781 = repeat ( "1", 5781 - 5631 + 1 );
+
+            field drive _5782to5790;
+            _5782to5790 = repeat ( "0", 9 );
+
+            field drive tail;
+            tail = repeat ( "1", 50000 );
+        }
+        Data = sig_U1RXD.dataLL + sig_U1RXD.dataLM + sig_U1RXD.dataHM + sig_U1RXD.dataHH
+            + sig_NF_DATA_1.dataLL + sig_NF_DATA_1.dataLM + sig_NF_DATA_1.dataHM +
+            sig_NF_DATA_1.dataHH + sig_NF_DQS.dataLL + sig_NF_DQS.dataLM +
+            sig_NF_DQS.dataHM + sig_NF_DQS.dataHH + sig_U0TXD.dataLL + sig_U0TXD.dataLM +
+            sig_U0TXD.dataHM + sig_U0TXD.dataHH + sig_U0RXD.dataLL + sig_U0RXD.dataLM +
+            sig_U0RXD.dataHM + sig_U0RXD.dataHH + sig_U0CTS.dataLL + sig_U0CTS.dataLM +
+            sig_U0CTS.dataHM + sig_U0CTS.dataHH + sig_U0RTS.dataLL + sig_U0RTS.dataLM +
+            sig_U0RTS.dataHM + sig_U0RTS.dataHH;
+    }
+
+    transaction waitCycles ( UnsignedLong IN Cycles ) {
+
+        define sig_U1TXD {
+            field drive idle;
+            idle = repeat ( "X", Cycles );
+        }
+
+        define sig_U1RXD {
+            field drive idle;
+            idle = repeat ( "X", Cycles );
+        }
+
+        define sig_NF_DATA_1 {
+            field drive idle;
+            idle = repeat ( "X", Cycles );
+        }
+
+        define sig_NF_DQS {
+            field drive idle;
+            idle = repeat ( "X", Cycles );
+        }
+
+        define sig_U0TXD {
+            field drive idle;
+            idle = repeat ( "X", Cycles );
+        }
+
+        define sig_U0RXD {
+            field drive idle;
+            idle = repeat ( "X", Cycles );
+        }
+
+        define sig_U0CTS {
+            field drive idle;
+            idle = repeat ( "X", Cycles );
+        }
+
+        define sig_U0RTS {
+            field drive idle;
+            idle = repeat ( "X", Cycles );
+        }
+
+        define sig_SDI1 { // for read
+            field drive idle;
+            idle = repeat ( "1", Cycles );
+        }
+    }
+}
+

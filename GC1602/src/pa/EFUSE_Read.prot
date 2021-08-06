@@ -1,0 +1,632 @@
+protocol EFUSE_Read {
+    val UnsignedLong a1 = 200;
+    val UnsignedLong a2 = 80;
+    val UnsignedLong a3 = 26100;
+    val UnsignedLong a4 = 67; //Bist vector bits number
+    val UnsignedLong a5 = 12290; //from start  to H  a5 include a4
+    val UnsignedLong ah = 1; //H
+    val UnsignedLong a6 = 32; //read data value
+    //    val UnsignedLong a7=100;  //output H
+    val UnsignedLong a7 = 64; //output H
+    val UnsignedLong a = a1 + a2 + a3 + a5 + ah + a6 + a7; //38803
+
+    // mapping of state characters
+    mapping = drv[state0 = "0", state1 = "1"], rcv[state0 = "L", state1 = "H", capture =
+        "C", ignore = "X"];
+        // signal roles
+    signalRole EFUSE_BIST_PCLK { //clk pins
+        idleSequence = "0";
+    }
+    signalRole EFUSE_BIST_PRESET { //preset pins
+        idleSequence = "1";
+    }
+    signalRole EFUSE_BIST_START { //write/read address and write data
+        idleSequence = "X";
+    }
+    signalRole EFUSE_BIST_DONE { //get read value pins
+        idleSequence = "0";
+    }
+    signalRole EFUSE_BIST_EN { //enable pins
+        idleSequence = "1";
+    }
+    signalRole EFUSE_ENK1 { //get read value pins
+        idleSequence = "0";
+    }
+    signalRole EFUSE_ENK2 { //enable pins
+        idleSequence = "0";
+    }
+
+    transaction wait_Efuse ( UnsignedLong IN Cycles ) {
+
+        define EFUSE_BIST_PCLK {
+            field drive idle {
+            };
+            idle = repeat ( "0", Cycles );
+        }
+
+        define EFUSE_BIST_PRESET {
+            field drive idle {
+            };
+            idle = repeat ( "1", Cycles );
+        }
+
+        define EFUSE_BIST_START {
+            field drive idle {
+            };
+            idle = repeat ( "X", Cycles );
+        }
+
+        define EFUSE_BIST_DONE {
+            field drive idle {
+            };
+            idle = repeat ( "X", Cycles );
+        }
+
+        define EFUSE_BIST_EN {
+            field drive idle {
+            };
+            idle = repeat ( "0", Cycles );
+        }
+
+        define EFUSE_ENK1 {
+            field drive idle {
+            };
+            idle = repeat ( "0", Cycles );
+        }
+
+        define EFUSE_ENK2 {
+            field drive idle {
+            };
+            idle = repeat ( "1", Cycles );
+        }
+    }
+
+    transaction write_Efuse_compare ( UnsignedLong IN Data ) { // data type UnsignedLong
+
+
+        define EFUSE_BIST_PCLK {
+        //              field drive idle {};
+        //            idle = repeat("0", 3);
+            field drive clk {
+            };
+            clk = repeat ( "P", a7 );
+            //            field drive clkDisable {};
+            //            clkDisable =  "0";
+
+        }
+
+        define EFUSE_BIST_PRESET {
+        //            field drive idle {};
+        //            idle = repeat("0", a7);
+            field drive preset {
+            };
+            preset = repeat ( "1", a7 );
+            //            field drive leDisable {};
+            //            leDisable = "1";
+
+        }
+
+        define EFUSE_BIST_START {
+            field drive end {
+            };
+            end = repeat ( "0", a7 );
+        }
+
+        define EFUSE_BIST_DONE {
+            field receive CompareData1 {
+            };
+            //            @Properties (captureMode = isOut(Data))  //used for capture, if compare please delete
+            //                  @Properties(mask=maskAll[15..0])//bit 15-bit0     unsigned long  type 0x000f    bit15-bit0
+            CompareData1 = Data[0..( a7 - 1 )]; // 16 data bits of data type BitSequence (of any bit length) with MSB (bit 0)...LSB (bit 15)
+
+        }
+
+        define EFUSE_BIST_EN {
+            field drive enable {
+            };
+            enable = repeat ( "1", a7 );
+        }
+
+        define EFUSE_ENK1 {
+            field drive idle {
+            };
+            idle = repeat ( "1", a7 ); //0 for read. 1 for write
+
+        }
+
+        define EFUSE_ENK2 {
+            field drive idle {
+            };
+            idle = repeat ( "0", a7 ); //1 for read, 0 for write
+
+        }
+    }
+
+    transaction write_Efuse_bf ( UnsignedLong IN Address, UnsignedLong IN Data ) { // data type UnsignedLong
+
+
+        define EFUSE_BIST_PCLK {
+        //              field drive idle {};
+        //            idle = repeat("0", 3);
+            field drive clk {
+            };
+            clk = repeat ( "P", a - a7 );
+            //            field drive clkDisable {};
+            //            clkDisable =  "0";
+
+        }
+
+        define EFUSE_BIST_PRESET {
+            field drive idle {
+            };
+            idle = repeat ( "0", a1 + a2 );
+
+            field drive preset {
+            };
+            preset = repeat ( "1", a - a1 - a2 - a7 );
+            //            field drive leDisable {};
+            //            leDisable = "1";
+
+        }
+
+        define EFUSE_BIST_START {
+            field drive start {
+            };
+            start = repeat ( "0", a1 + a2 + a3 );
+
+            field drive Start {
+            };
+            Start = repeat ( "1", 1 );
+
+            field drive dummybit {
+            };
+            dummybit = repeat ( "0", 4 );
+
+            field drive lock_bit_wr_en {
+            };
+            lock_bit_wr_en = repeat ( "0", 1 );
+
+            field drive wait_max_en {
+            };
+            wait_max_en = repeat ( "1", 1 );
+
+            field drive shift_out_en {
+            };
+            shift_out_en = repeat ( "1", 1 );
+
+            field drive margin_en {
+            };
+            margin_en = repeat ( "0", 1 );
+
+            field drive writeData {
+            };
+            writeData = Data[31..0]; // 15 address bits of data type UnsignedLong (of max 64 bits) with MSB (bit 14)...LSB (bit 0)
+            field drive writeAddress {
+            };
+            // writeAddress = Address[1 .. 15]; // 15 address bits of data type BitSequence (of any bit length) with MSB (bit 1)...LSB (bit 15)
+            writeAddress = Address[15..0]; // 15 address bits of data type UnsignedLong (of max 64 bits) with MSB (bit 14)...LSB (bit 0)
+            field drive Command7 {
+            };
+            Command7 = repeat ( "1", 1 );
+
+            field drive Command6_ {
+            };
+            Command6_ = repeat ( "0", 1 );
+
+            field drive Command5 {
+            };
+            Command5 = repeat ( "1", 1 );
+
+            field drive Command4 {
+            };
+            Command4 = repeat ( "0", 1 );
+
+            field drive Command3 {
+            };
+            Command3 = repeat ( "1", 1 );
+
+            field drive Command2 {
+            };
+            Command2 = repeat ( "0", 1 );
+
+            field drive Command1 {
+            };
+            Command1 = repeat ( "1", 1 );
+
+            field drive Command0 {
+            };
+            Command0 = repeat ( "0", 1 );
+
+            field drive Tail1 {
+            };
+            Tail1 = repeat ( "1", 1 );
+
+            field drive Tail0 {
+            };
+            Tail0 = repeat ( "0", 1 );
+
+            field drive end {
+            };
+            end = repeat ( "0", a5 - a4 + ah + a6 + a7 - a7 );
+        }
+
+        define EFUSE_BIST_DONE {
+            field drive idle {
+            };
+            idle = repeat ( "X", a1 ); //smt8 only
+            //                  idle = repeat("L", a1);smt7
+            field drive idle1 {
+            };
+            idle1 = repeat ( "L", a2 );
+
+            field drive idle2 {
+            };
+            idle2 = repeat ( "L", a3 );
+
+            field drive idle3 {
+            };
+            idle3 = repeat ( "L", a5 );
+
+            field drive idle4 {
+            };
+            idle4 = repeat ( "H", ah );
+
+            field receive readval {
+            };
+            readval = repeat ( "X", a6 );
+            //            field receive readData {};
+            //            @Properties (captureMode = isOut(Data))  //used for capture, if compare please delete
+            //            // readData = Data[0 .. 15];  // 16 data bits of data type BitSequence (of any bit length) with MSB (bit 0)...LSB (bit 15)
+            //            readData = Data[31 .. 0]; //a6 only for compare,but must define though capture 16 data bits of data type UnsignedLong (of max 64 bits) with MSB (bit 15)...LSB (bit 0) //used for compare
+
+            //            field receive idle5 {};
+            //            idle5 = repeat("H", a7);
+
+        }
+
+        define EFUSE_BIST_EN {
+            field drive idle {
+            };
+            idle = repeat ( "0", a1 );
+
+            field drive enable {
+            };
+            enable = repeat ( "1", a - a1 - a7 );
+        }
+
+        define EFUSE_ENK1 {
+            field drive idle {
+            };
+            idle = repeat ( "1", a - a7 ); //0 for read. 1 for write
+
+        }
+
+        define EFUSE_ENK2 {
+            field drive idle {
+            };
+            idle = repeat ( "0", a - a7 ); //1 for read, 0 for write
+
+        }
+    }
+
+    transaction write_Efuse ( UnsignedLong IN Address, UnsignedLong IN Data ) { // data type UnsignedLong
+
+
+        define EFUSE_BIST_PCLK {
+        //              field drive idle {};
+        //            idle = repeat("0", 3);
+            field drive clk {
+            };
+            clk = repeat ( "P", a );
+            //            field drive clkDisable {};
+            //            clkDisable =  "0";
+
+        }
+
+        define EFUSE_BIST_PRESET {
+            field drive idle {
+            };
+            idle = repeat ( "0", a1 + a2 );
+
+            field drive preset {
+            };
+            preset = repeat ( "1", a - a1 - a2 );
+            //            field drive leDisable {};
+            //            leDisable = "1";
+
+        }
+
+        define EFUSE_BIST_START {
+            field drive start {
+            };
+            start = repeat ( "0", a1 + a2 + a3 );
+
+            field drive Start {
+            };
+            Start = repeat ( "1", 1 );
+
+            field drive dummybit {
+            };
+            dummybit = repeat ( "0", 4 );
+
+            field drive lock_bit_wr_en {
+            };
+            lock_bit_wr_en = repeat ( "0", 1 );
+
+            field drive wait_max_en {
+            };
+            wait_max_en = repeat ( "1", 1 );
+
+            field drive shift_out_en {
+            };
+            shift_out_en = repeat ( "1", 1 );
+
+            field drive margin_en {
+            };
+            margin_en = repeat ( "0", 1 );
+
+            field drive writeData {
+            };
+            writeData = Data[31..0]; // 15 address bits of data type UnsignedLong (of max 64 bits) with MSB (bit 14)...LSB (bit 0)
+            field drive writeAddress {
+            };
+            // writeAddress = Address[1 .. 15]; // 15 address bits of data type BitSequence (of any bit length) with MSB (bit 1)...LSB (bit 15)
+            writeAddress = Address[15..0]; // 15 address bits of data type UnsignedLong (of max 64 bits) with MSB (bit 14)...LSB (bit 0)
+            field drive Command7 {
+            };
+            Command7 = repeat ( "1", 1 );
+
+            field drive Command6_ {
+            };
+            Command6_ = repeat ( "0", 1 );
+
+            field drive Command5 {
+            };
+            Command5 = repeat ( "1", 1 );
+
+            field drive Command4 {
+            };
+            Command4 = repeat ( "0", 1 );
+
+            field drive Command3 {
+            };
+            Command3 = repeat ( "1", 1 );
+
+            field drive Command2 {
+            };
+            Command2 = repeat ( "0", 1 );
+
+            field drive Command1 {
+            };
+            Command1 = repeat ( "1", 1 );
+
+            field drive Command0 {
+            };
+            Command0 = repeat ( "0", 1 );
+
+            field drive Tail1 {
+            };
+            Tail1 = repeat ( "1", 1 );
+
+            field drive Tail0 {
+            };
+            Tail0 = repeat ( "0", 1 );
+
+            field drive end {
+            };
+            end = repeat ( "0", a5 - a4 + ah + a6 + a7 );
+        }
+
+        define EFUSE_BIST_DONE {
+            field drive idle {
+            };
+            idle = repeat ( "X", a1 ); //smt8 only
+            //                  idle = repeat("L", a1);smt7
+            field drive idle1 {
+            };
+            idle1 = repeat ( "L", a2 );
+
+            field drive idle2 {
+            };
+            idle2 = repeat ( "L", a3 );
+
+            field drive idle3 {
+            };
+            idle3 = repeat ( "L", a5 );
+
+            field drive idle4 {
+            };
+            idle4 = repeat ( "H", ah );
+
+            field receive readval {
+            };
+            readval = repeat ( "X", a6 );
+            //            field receive readData {};
+            //            @Properties (captureMode = isOut(Data))  //used for capture, if compare please delete
+            //            // readData = Data[0 .. 15];  // 16 data bits of data type BitSequence (of any bit length) with MSB (bit 0)...LSB (bit 15)
+            //            readData = Data[31 .. 0]; //a6 only for compare,but must define though capture 16 data bits of data type UnsignedLong (of max 64 bits) with MSB (bit 15)...LSB (bit 0) //used for compare
+            field receive idle5 {
+            };
+            idle5 = repeat ( "H", a7 );
+        }
+
+        define EFUSE_BIST_EN {
+            field drive idle {
+            };
+            idle = repeat ( "0", a1 );
+
+            field drive enable {
+            };
+            enable = repeat ( "1", a - a1 );
+        }
+
+        define EFUSE_ENK1 {
+            field drive idle {
+            };
+            idle = repeat ( "1", a ); //0 for read. 1 for write
+
+        }
+
+        define EFUSE_ENK2 {
+            field drive idle {
+            };
+            idle = repeat ( "0", a ); //1 for read, 0 for write
+
+        }
+    }
+    //    transaction readEfuseA (BitSequence IN Address, BitSequence OUT Data) { // data type BitSequence
+    transaction read_Efuse ( UnsignedLong IN Address, UnsignedLong OUT Data ) { // data type UnsignedLong
+
+
+        define EFUSE_BIST_PCLK {
+        //              field drive idle {};
+        //            idle = repeat("0", 3);
+            field drive clk {
+            };
+            clk = repeat ( "P", a );
+            //            field drive clkDisable {};
+            //            clkDisable =  "0";
+
+        }
+
+        define EFUSE_BIST_PRESET {
+            field drive idle {
+            };
+            idle = repeat ( "0", a1 + a2 );
+
+            field drive preset {
+            };
+            preset = repeat ( "1", a - a1 - a2 );
+            //            field drive leDisable {};
+            //            leDisable = "1";
+
+        }
+
+        define EFUSE_BIST_START {
+            field drive start {
+            };
+            start = repeat ( "0", a1 + a2 + a3 );
+
+            field drive Start {
+            };
+            Start = repeat ( "1", 1 );
+
+            field drive dummybit {
+            };
+            dummybit = repeat ( "0", 4 );
+
+            field drive lock_bit_wr_en {
+            };
+            lock_bit_wr_en = repeat ( "0", 1 );
+
+            field drive wait_max_en {
+            };
+            wait_max_en = repeat ( "1", 1 );
+
+            field drive shift_out_en {
+            };
+            shift_out_en = repeat ( "1", 1 );
+
+            field drive margin_en {
+            };
+            margin_en = repeat ( "0", 1 );
+
+            field drive wr_rd_data {
+            };
+            wr_rd_data = repeat ( "0", a6 );
+
+            field drive writeAddress {
+            };
+            // writeAddress = Address[1 .. 15]; // 15 address bits of data type BitSequence (of any bit length) with MSB (bit 1)...LSB (bit 15)
+            writeAddress = Address[15..0]; // 15 address bits of data type UnsignedLong (of max 64 bits) with MSB (bit 14)...LSB (bit 0)
+            field drive Command7 {
+            };
+            Command7 = repeat ( "0", 1 );
+
+            field drive Command6_5 {
+            };
+            Command6_5 = repeat ( "1", 2 );
+
+            field drive Command4_3 {
+            };
+            Command4_3 = repeat ( "0", 2 );
+
+            field drive Command2_1 {
+            };
+            Command2_1 = repeat ( "1", 2 );
+
+            field drive Command0 {
+            };
+            Command0 = repeat ( "0", 1 );
+
+            field drive Tail1 {
+            };
+            Tail1 = repeat ( "1", 1 );
+
+            field drive Tail0 {
+            };
+            Tail0 = repeat ( "0", 1 );
+
+            field drive end {
+            };
+            end = repeat ( "0", a5 - a4 + ah + a6 + a7 );
+        }
+
+        define EFUSE_BIST_DONE {
+            field drive idle {
+            };
+            idle = repeat ( "L", a1 );
+
+            field drive idle1 {
+            };
+            idle1 = repeat ( "L", a2 );
+
+            field drive idle2 {
+            };
+            idle2 = repeat ( "L", a3 );
+
+            field drive idle3 {
+            };
+            idle3 = repeat ( "L", a5 );
+
+            field drive idle4 {
+            };
+            idle4 = repeat ( "H", ah );
+
+            field receive readData {
+            };
+            @Properties ( captureMode = isOut ( Data ) ) //used for capture, if compare please delete
+            // readData = Data[0 .. 15];  // 16 data bits of data type BitSequence (of any bit length) with MSB (bit 0)...LSB (bit 15)
+            readData = Data[31..0]; //a6 only for compare,but must define though capture 16 data bits of data type UnsignedLong (of max 64 bits) with MSB (bit 15)...LSB (bit 0) //used for compare
+            field drive idle5 {
+            };
+            idle5 = repeat ( "H", a7 );
+        }
+
+        define EFUSE_BIST_EN {
+            field drive idle {
+            };
+            idle = repeat ( "0", a1 );
+
+            field drive enable {
+            };
+            enable = repeat ( "1", a - a1 );
+        }
+
+        define EFUSE_ENK1 {
+            field drive idle {
+            };
+            idle = repeat ( "0", a ); //0 for read. 1 for write
+
+        }
+
+        define EFUSE_ENK2 {
+            field drive idle {
+            };
+            idle = repeat ( "1", a ); //1 for read, 0 for write
+
+        }
+        Data = EFUSE_BIST_DONE.readData[31..0]; //only for capture
+
+    }
+}
