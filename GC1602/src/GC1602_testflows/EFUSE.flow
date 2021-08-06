@@ -1,0 +1,59 @@
+flow EFUSE {
+    setup {
+        suite Relay_Switch_Restore_1 calls miscellaneous_tml.SetUtilityLines {
+            relayList_On = "K02";
+            relayList_Off =
+            "K00+K01+K02+K03+K04+K05+KK1+K09+K10+K11+K12+K15+K16+K13+K14";
+        }
+        //    suite Defuse_secure_read_null calls com.advantest.itee.tml.actml.FunctionalTest {
+        //      measurement.pattern = setupRef(vectors.NemoL_AnalogIP_EFUSE_BIST_ALL0_CHECK_AA_20191025);
+        //      measurement.specification = setupRef(mainSpecs.Nemol_B201.Spc_Lev_eqn2_spec1_set1_Tim_eqn96_spec1_set1);
+        //    }
+        suite Defuse_Stopper calls GC1602_tml.EFUSE.EfuseStopper {
+        }
+        suite Defuse_read_null calls GC1602_tml.EFUSE.Ddie_Efuse_Read_NULL {
+            importSpec =
+            setupRef(GC1602_mainSpecification.Spc_Lev_eqn2_spec1_set1_Tim_eqn96_spec6_set1);
+        }
+        suite Defuse_Write calls GC1602_tml.EFUSE.Ddie_Efuse_Write {
+            importSpec =
+            setupRef(GC1602_mainSpecification.Spc_Lev_eqn2_spec1_set1_Tim_eqn96_spec6_set1);
+        }
+        suite Defuse_read_all calls GC1602_tml.EFUSE.Ddie_Efuse_Read {
+            importSpec =
+            setupRef(GC1602_mainSpecification.Spc_Lev_eqn2_spec1_set1_Tim_eqn96_spec6_set1);
+
+        }
+        suite Ddie_Efuse_Write_debug calls
+        GC1602_tml.EFUSE.Ddie_Efuse_Write_debug {
+            importSpec =
+            setupRef(GC1602_mainSpecification.Spc_Lev_eqn2_spec1_set1_Tim_eqn96_spec6_set1);
+            Efs_W_Idx_Start = 41;
+            Efs_W_Idx_End = 41;
+        }
+
+        suite Ddie_Efuse_Read_debug calls GC1602_tml.EFUSE.Ddie_Efuse_Read_debug {
+            importSpec =
+            setupRef(GC1602_mainSpecification.Spc_Lev_eqn2_spec1_set1_Tim_eqn96_spec6_set1);
+            readStartIdx = 40;
+            readStoptIdx = 60;
+        }
+    }
+
+    execute {
+        Relay_Switch_Restore_1.execute();
+        //    Defuse_secure_read_null.bypass = true;
+        //    Defuse_secure_read_null.execute();
+        Defuse_read_null.execute();
+//        Ddie_Efuse_Read_debug.execute();
+        Defuse_Stopper.execute();
+        if (! Defuse_Stopper.stop) {
+//                Defuse_Write.execute();
+//            Ddie_Efuse_Write_debug.execute();
+
+        }
+//        Ddie_Efuse_Read_debug.execute();
+        Defuse_read_all.execute();
+
+    }
+}

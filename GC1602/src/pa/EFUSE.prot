@@ -1,0 +1,276 @@
+protocol EFUSE {
+// Read  Template : NemoL_AnalogIP_EFUSE_BIST_read_AA_20191028
+// Write Template : NemoL_AnalogIP_EFUSE_BIST_write_noprotection_AA_20191028
+//----------------------------------------
+    val UnsignedLong readVectors = 563; // numOfVectors
+    val UnsignedLong writeVectors = 12777; // numOfVectors
+    val UnsignedLong writeRPTV = 1000;
+    mapping = drv[state0 = "0", state1 = "1"], rcv[state0 = "L", state1 = "H", capture =
+        "C", ignore = "X"];
+    signalRole sig_RFCTL_2_ {
+        idleSequence = "1";
+    }
+    signalRole sig_RFCTL_3_ {
+        idleSequence = "0";
+    }
+
+    // read address pin
+    signalRole sig_RFCTL_4_ {
+        idleSequence = "1";
+    }
+
+    // read data pin
+    signalRole sig_RFCTL_9_ {
+        idleSequence = "0";
+    }
+    signalRole sig_RFCTL_10_ {
+        idleSequence = "0";
+    }
+    signalRole sig_NF_DATA_0 {
+        idleSequence = "1";
+    }
+    signalRole sig_NF_DATA_2 {
+        idleSequence = "X";
+    }
+
+    transaction read ( UnsignedLong IN Address, UnsignedLong OUT Data ) {
+
+        define sig_RFCTL_2_ {
+            field drive all1;
+            all1 = repeat ( "1", readVectors );
+        }
+
+        define sig_NF_DATA_0 {
+            field drive _0to21;
+            _0to21 = repeat ( "1", 22 );
+
+            field drive _22to47;
+            _22to47 = repeat ( "0", 26 );
+
+            field drive _48to562;
+            _48to562 = repeat ( "1", 562 - 48 + 1 );
+        }
+
+        define sig_NF_DATA_2 {
+            field drive all0;
+            all0 = repeat ( "0", readVectors );
+        }
+
+        define sig_RFCTL_10_ {
+            field drive _0to21;
+            _0to21 = repeat ( "0", 22 );
+
+            field drive _22toEnd;
+            _22toEnd = repeat ( "1", readVectors - 22 );
+        }
+
+        define sig_RFCTL_3_ {
+            field drive _0to100;
+            _0to100 = repeat ( "0", 101 );
+
+            field drive _101toEnd;
+            _101toEnd = repeat ( "1", readVectors - 101 );
+        }
+
+        define sig_RFCTL_4_ { // read address pin
+            field drive _0to441;
+            _0to441 = repeat ( "0", 442 );
+
+            field drive start;
+            start = "1";
+
+            field drive Dummy;
+            Dummy = repeat ( "0", 4 );
+
+            field drive wr_en;
+            wr_en = "1";
+
+            field drive wait_max_en;
+            wait_max_en = "0";
+
+            field drive shiftout_en;
+            shiftout_en = "1";
+
+            field drive margin_en;
+            margin_en = "1";
+
+            field receive write_read_data;
+            write_read_data = repeat ( "0", 32 );
+
+            field drive rd_end_index;
+            rd_end_index = "10000111";
+
+            field drive address;
+            address = Address[7..0]; // TODO: LSB? MSB?
+            field drive command;
+            command = "01100110";
+
+            field drive TAIL;
+            TAIL = "10";
+
+            field drive clk_wave_to_end;
+            clk_wave_to_end = repeat ( "0", readVectors - 509 );
+        }
+
+        define sig_RFCTL_9_ { // read data pin
+            field receive idle;
+            idle = repeat ( "L", 527 );
+
+            field receive bist_done_s;
+            bist_done_s = "H";
+
+            field receive readData;
+            @Properties ( captureMode = isOut ( Data ) )
+            readData = Data[0..31]; // TODO: LSB? MSB?
+            field drive endidle;
+            endidle = repeat ( "X", 3 );
+        }
+        Data = sig_RFCTL_9_.readData[31..0]; // TODO: LSB? MSB?
+
+    }
+
+    transaction write ( UnsignedLong IN Address, UnsignedLong IN Data ) {
+
+        define sig_RFCTL_2_ {
+            field drive all1;
+            all1 = repeat ( "1", writeVectors + writeRPTV - 1 );
+        }
+
+        define sig_NF_DATA_0 {
+            field drive _0to21;
+            _0to21 = repeat ( "1", 22 );
+
+            field drive _22to47;
+            _22to47 = repeat ( "0", 47 - 22 + 1 );
+
+            field drive _48toEnd;
+            _48toEnd = repeat ( "1", writeVectors - 48 + writeRPTV - 1 );
+        }
+
+        define sig_NF_DATA_2 {
+            field drive all0;
+            all0 = repeat ( "0", writeVectors + writeRPTV - 1 );
+        }
+
+        define sig_RFCTL_10_ {
+            field drive _0to21;
+            _0to21 = repeat ( "0", 22 );
+
+            field drive _22toEnd;
+            _22toEnd = repeat ( "1", writeVectors - 22 + writeRPTV - 1 );
+        }
+
+        define sig_RFCTL_3_ {
+            field drive _0to100;
+            _0to100 = repeat ( "0", 101 + writeRPTV - 1 );
+
+            field drive _101toEnd;
+            _101toEnd = repeat ( "1", writeVectors - 101 );
+        }
+
+        define sig_RFCTL_4_ { // read address pin
+            field drive _0to441;
+            _0to441 = repeat ( "0", 442 + writeRPTV - 1 );
+
+            field drive start_bit;
+            start_bit = "1";
+
+            field drive Dummy; // clk_wave 443-446
+            Dummy = "0000";
+
+            field drive loc_bit_wr_en;
+            loc_bit_wr_en = "0";
+
+            field drive wait_max_en;
+            wait_max_en = "1";
+
+            field drive shiftout_en;
+            shiftout_en = "1";
+
+            field drive margin_en; // 450
+            margin_en = "1";
+
+            field drive write_read_data;
+            write_read_data = Data[31..0]; // TODO: LSB482? MSB451?
+
+            field drive rd_end_index;
+            rd_end_index = "10000111";
+
+            field drive address;
+            address = Address[7..0]; // TODO: LSB? MSB?
+
+            field drive command;
+            command = "10101010";
+
+            field drive TAIL; //508
+            TAIL = "10";
+
+            field drive clk_wave_to_end;
+            clk_wave_to_end = repeat ( "0", writeVectors - 509 );
+        }
+
+        define sig_RFCTL_9_ { // read data pin
+            // field drive all1;
+            // all1 = repeat ( "X", writeVectors + writeRPTV - 1 );
+
+            field receive _0to12732;
+            _0to12732 = repeat ( "L", 12733 + writeRPTV - 1 );
+
+            field receive _Byte1; //12733
+            _Byte1 = "HLLLHLLL";
+
+            field receive _Byte2; //12741
+            _Byte2 = "HHLLLLLH";
+
+            field receive _Byte3; //12749
+            _Byte3 = "HHHHLLHL";
+
+            field receive _Byte4; //12757
+            _Byte4 = "LLLHLLLH";
+
+            field receive _Byte5; //12765
+            _Byte5 = "LHHHHHHH";
+
+            field receive _End; //12773
+            _End = "HHHH";
+        }
+    }
+
+    transaction waitCycles ( UnsignedLong IN Cycles ) {
+
+        define sig_RFCTL_2_ {
+            field drive idle;
+            idle = repeat ( "1", Cycles );
+        }
+
+        define sig_NF_DATA_0 {
+            field drive idle;
+            idle = repeat ( "1", Cycles );
+        }
+
+        define sig_NF_DATA_2 {
+            field drive idle;
+            idle = repeat ( "0", Cycles );
+        }
+
+        define sig_RFCTL_10_ {
+            field drive idle;
+            idle = repeat ( "1", Cycles );
+        }
+
+        define sig_RFCTL_3_ {
+            field drive idle;
+            idle = repeat ( "1", Cycles );
+        }
+
+        define sig_RFCTL_4_ {
+            field drive idle;
+            idle = repeat ( "0", Cycles );
+        }
+
+        define sig_RFCTL_9_ {
+            field drive idle;
+            idle = repeat ( "X", Cycles );
+        }
+    }
+}

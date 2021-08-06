@@ -1,0 +1,95 @@
+
+# Example for a tester.model file, see detailed syntax description in the TDC
+
+GLOBAL
+  testhead = TH_2CC                          # TH_1CC | TH_2CC | TH_4CC | TH_8CC
+  dut_interface = SOC_8GROUP                 # SOC_4GROUP | SOC_8GROUP 
+  hpib_interface = vxi11/e5810a/192.168.0.100/gpib0
+#  utility_lines = 64, type=static, pogo_size=16
+#  mux_boards = 8, type=PMUX01, pogoblocks=866,868,870,872,881,883,885,887
+
+
+POGOCABLING
+#  slot = 301, HW = PS1600, pogoblocks = 111-118
+ # slot = 310, HW = DPS128, pogoblocks = HV:(201-208)
+#
+#  slot = 102, HW = PS1600B,    pogoblocks = 125-132
+ # 114: pogoblocks = "901, 902" # WSRF
+ 
+  101: pogoblocks = "325-332"
+  102: pogoblocks = "401-408"
+  103: pogoblocks = "125-132"
+  104: pogoblocks = "117-124"
+  105: pogoblocks = "101-108"
+  106: pogoblocks = "201-208"
+  107: pogoblocks = "225,425,229,429"
+  108: pogoblocks = "301,302,305,306"
+#  109, HW = MSDPS,      pogoblocks = 1
+  110: pogoblocks = "317" #Pure Clock
+#  111: pogoblocks = "226,426,230,430,303,304,307,308"
+  112: pogoblocks = "217-224"
+  113: pogoblocks = "109-116"
+  114: pogoblocks = "901, 902" # WSRF
+  #114: pogoblocks = "309-316"
+  115: pogoblocks = "231,431,232,432" # WSMX
+  
+  116: pogoblocks = "409-416"
+  117: pogoblocks = "209-216"
+#  118, HW = MSDPS,      pogoblocks = 2
+  
+   
+IOCHANNEL
+  10101-13216: HW = PS1600, speed = max-rate, smem = 112M
+  20101-22416: HW = PS1600, speed = max-rate, smem = 112M
+  32501-33216: HW = PS1600, speed = max-rate, smem = 112M
+  40101-41616: HW = PS1600, speed = max-rate, smem = 112M
+# 40101-40416:HW = PS9G,   speed =  max-rate, smem = 112M, diff, tmu, loopback = max-rate
+DPS
+  22901-22916: type = DCS-DPS128HC
+  42901-42916: type = DCS-DPS128HC
+  22501-22516: type = DCS-DPS128HC
+  42501-42516: type = DCS-DPS128HC
+  30101-30216: type = DCS-DPS128HC
+  30501-30616: type = DCS-DPS128HC
+# 22601-22616: type = DCS-DPS128HC
+# 23001-23016: type = DCS-DPS128HC
+# 43001-43016: type = DCS-DPS128HC
+# 42601-42616: type = DCS-DPS128HC
+ANALOGBOARD
+  901-902: hw = N2600
+  317: type = LPN, core=4
+  231: HW=E9740, mtype=highspeed
+  431: HW=E9740, mtype=highspeed
+  232: HW=E9740, mtype=highspeed
+  432: HW=E9740, mtype=highspeed
+
+#type=REDIRECT, subtype=E8023PF, config=  1:(201 202)   2:(203 204)
+#  slot = 304, HW = DPS128,     pogoblocks = HC:(225 657 425 857 229 661 429 861), #type=REDIRECT, subtype=E8023PC, config=225:(225 657) 425:(425 857) 229:(229 661) 429:(429 #861)
+#  slot = 306, HW = DPS128,     pogoblocks = HC:(211 643 212 644),                 #type=REDIRECT, subtype=E8023PD, config=211:(211 643) 212:(212 644)
+
+
+ETC
+#  REFERENCECLOCK : input = INTERNAL, output_at_rf_connector = ON
+
+DMM
+#  1: cardcage=1, type=HP3458A, address=18
+#  2: cardcage=2, type=HP3458A, address=19
+#  3: cardcage=3, type=HP3458A, address=24
+#  4: cardcage=4, type=HP3458A, address=25
+#  5: cardcage=5, type=HP3458A, address=26
+#  6: cardcage=6, type=HP3458A, address=27
+#  7: cardcage=7, type=HP3458A, address=28
+#  8: cardcage=8, type=HP3458A, address=29
+
+
+
+#EXTERNAL_INSTRUMENTS
+#TracecalPsu1 : type = PowerSupply,       model = 6624A, ifName = Gio,       networkAddress = 192.168.0.100, portAddress = 3 
+#TracecalPsu2 : type = PowerSupply,       model = 6654A, ifName = Gio,       networkAddress = 192.168.0.100, portAddress = 4 
+#TracecalDmm1 : type = DigitalMultiMeter, model = 3458A, ifName = GioLegacy, networkAddress = 192.168.0.100, portAddress = 6 
+#TracecalDmm2 : type = DigitalMultiMeter, model = 3458A, ifName = GioLegacy, networkAddress = 192.168.0.100, portAddress = 7 
+
+
+#End of example model file
+
+

@@ -1,0 +1,20 @@
+/**
+ * Example testprogram
+ */
+testprogram GC1602 {
+    dutboard = dbd.GC1602_Pogo_pins;
+
+    utilityLinesPerBlock = 16;
+
+    var dsa_path = "my_dsa";
+    var Device_code_s = 0;
+    var stop_flag = "true";
+
+    testflow PreBind {
+        flow = GC1602_testflows.preBind;
+    }
+
+    testflow Main {
+        flow = GC1602_testflows.Main;
+    }
+}

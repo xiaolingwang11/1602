@@ -1,0 +1,38 @@
+flow Main {
+    setup {
+        flow OS calls GC1602_testflows.OS {
+        }
+
+        flow PLL calls GC1602_testflows.PLL {
+        }
+
+        flow EFUSE calls GC1602_testflows.EFUSE {
+        }
+
+    }
+    execute {
+        OS.execute();
+        PLL.execute();
+        EFUSE.execute();
+        addBin(1);
+    }
+}
+
+/*
+* The following PS1600 pin in pattern's SC is Q
+* --------------------------- for USB flow
+* USB20_DM
+* USB20_DP
+* PAD_USB20_VREXT_1P8
+* --------------------------- for LVDSRF flow
+* LVDSRF_RXD0N_CAL
+* LVDSRF_RXD0P
+* LVDSRF_RXD0P_CAL
+* LVDSRF_TXD0N_CAL
+* LVDSRF_TXD0P
+* LVDSRF_TXD0P_CAL
+* PAD_LVDSRF_REXT
+* ---------------------------
+*/
+
+
